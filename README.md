@@ -6,6 +6,6 @@ JWTs are issued with a short 3s expiry (set in `SingleClientRepository#tokenTtlS
 Steps to reproduce:
  - run the OAuth Authorization Server AuthServerKt class
  - `docker-compose up`
- - run simple producer or consumer in `OAuthBearerTest`
+ - run the consumer in `OAuthBearerTest#consume`
  - stop AuthServerKt
  - observe producers and consumers happily keep producing even after their tokens expire (plus clock skew)
