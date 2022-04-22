@@ -1,0 +1,52 @@
+version: '3.5'
+
+services:
+  dockerhost:
+    image: qoomon/docker-host
+    cap_add: [ "NET_ADMIN", "NET_RAW" ]
+    restart: on-failure
+
+  zookeeper:
+    image: docker.io/bitnami/zookeeper:3.8
+    hostname: zookeeper
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_SERVERS: zookeeper:2888:3888
+      ALLOW_ANONYMOUS_LOGIN: yes
+
+  kafka:
+    image: docker.io/bitnami/kafka:3.1
+    hostname: kafka
+    container_name: kafka
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+    environment:
+      ALLOW_PLAINTEXT_LISTENER: true
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: OAUTHTEST:SASL_PLAINTEXT,UNSECURE:PLAINTEXT
+      KAFKA_CFG_LISTENERS: OAUTHTEST://:9092,UNSECURE://:9093
+      KAFKA_CFG_ADVERTISED_LISTENERS: OAUTHTEST://localhost:9092,UNSECURE://localhost:9093
+      KAFKA_CFG_INTER_BROKER_LISTENER_NAME: UNSECURE
+      KAFKA_CFG_SASL_ENABLED_MECHANISMS: OAUTHBEARER
+      KAFKA_CFG_LISTENER_NAME_OAUTHTEST_OAUTHBEARER_SASL_JAAS_CONFIG: "org.apache.kafka.common.security.oauthbearer.OAuthBearerLoginModule required;"
+      KAFKA_CFG_LISTENER_NAME_OAUTHTEST_OAUTHBEARER_SASL_SERVER_CALLBACK_HANDLER_CLASS: org.apache.kafka.common.security.oauthbearer.secured.OAuthBearerValidatorCallbackHandler
+      KAFKA_CFG_LISTENER_NAME_OAUTHTEST_OAUTHBEARER_CONNECTIONS_MAX_REAUTH_MS: 5000
+      KAFKA_CFG_SASL_OAUTHBEARER_JWKS_ENDPOINT_URL: "http://dockerhost:8080/oauth2/jwks"
+      KAFKA_CFG_SASL_OAUTHBEARER_EXPECTED_AUDIENCE: "client1"
+      KAFKA_CFG_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      KAFKA_CFG_BROKER_ID: 1
+      KAFKA_CFG_CONNECTIONS_MAX_REAUTH_MS: 5000
+      KAFKA_CFG_CONNECTIONS_MAX_IDLE_MS: 5000
+      KAFKA_CLIENT_USERS: user
+      KAFKA_CLIENT_PASSWORDS: password
+    volumes:
+      - './config/kafka_jaas.conf:/opt/bitnami/kafka/conf/kafka_jaas.conf:ro'
+    depends_on:
+      - zookeeper
+      - dockerhost
+
+
