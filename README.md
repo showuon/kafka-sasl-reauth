@@ -5,7 +5,7 @@ JWTs are issued with a short 3s expiry (set in `SingleClientRepository#tokenTtlS
 
 Steps to reproduce:
 * run the OAuth Authorization Server AuthServerKt class
-   - run with the attached jar file:
+   - run with the attached jar file: (I'm built with jdk 17)
    ```
    java -jar luke-kafka-sasl-reauth.jar
    ```
