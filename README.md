@@ -4,8 +4,27 @@ Channels failing to reauthenticate beyond the `connections.max.reauth.ms` thresh
 JWTs are issued with a short 3s expiry (set in `SingleClientRepository#tokenTtlSeconds`)
 
 Steps to reproduce:
- - run the OAuth Authorization Server AuthServerKt class
- - `docker-compose up`
- - run the consumer in `OAuthBearerTest#consume`
- - stop AuthServerKt
- - observe producers and consumers happily keep producing even after their tokens expire (plus clock skew)
+* run the OAuth Authorization Server AuthServerKt class
+   - run with the attached jar file:
+   ```
+   java -jar luke-kafka-sasl-reauth.jar
+   ```
+   - or build the jar file from source:
+   ```
+   ./gradlew build
+   ```
+   If the tests failed, ignore it
+* run ZK and kafka:
+  - run with docket images:
+  ```
+  docker-compose up
+  ```
+  - or run with local ZK and Kafka, follow the kafka quickstart guide: https://kafka.apache.org/quickstart
+      - replace the config/server.properties in Kafka with the attached config/server.properties
+  
+* run the producer test in `OAuthBearerTest#test`
+  ```
+  ./gradlew test -d 
+  ```
+* stop AuthServerKt
+* observe producers and consumers happily keep producing even after their tokens expire (plus clock skew)
