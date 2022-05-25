@@ -12,10 +12,11 @@ Steps to reproduce:
    - or build the jar file from source:
    ```
    ./gradlew build
+   java -jar PATH_TO_OUTPUT_LIB/kafka-sasl-reauth.jar
    ```
    If the tests failed, ignore it
 * run ZK and kafka:
-  - run with docket images:
+  - run with docker images:
   ```
   docker-compose up
   ```
