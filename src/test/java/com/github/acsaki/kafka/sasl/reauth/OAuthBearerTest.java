@@ -48,11 +48,13 @@ class OAuthBearerTest {
     @Test
     void produceOneRecord() throws ExecutionException, InterruptedException, IOException {
         try (var producer = new KafkaProducer<String, String>(buildConfig(clientSecret()))) {
-            sendAndSleepSync(producer, message());
+            while (true) {
+                sendAndSleepSync(producer, message());
+            }
         }
     }
 
-    @Test
+//    @Test
     void testCredentialChange() throws ExecutionException, InterruptedException, IOException {
         String initialSecret = clientSecret();
         try (var producer = new KafkaProducer<String, String>(buildConfig(initialSecret))) {
@@ -65,7 +67,7 @@ class OAuthBearerTest {
         }
     }
 
-    @Test
+//    @Test
     void consume() throws IOException, InterruptedException {
         try (var consumer = new KafkaConsumer<String, String>(buildConfig(clientSecret()))) {
             consumer.subscribe(Collections.singletonList(topic));
@@ -153,6 +155,7 @@ class OAuthBearerTest {
         HttpResponse<String> response =
                 client.send(request, BodyHandlers.ofString());
         assertEquals(200, response.statusCode());
+        logger.info("client secret:" + response.body());
         return response.body();
     }
 
